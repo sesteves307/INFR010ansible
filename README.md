@@ -2,7 +2,7 @@
 
 README.MD GROUPE ESTEVES GIRAUD LERICHE MARTEAU
 
-Prérequis
+# Prérequis
 Avant de commencer, assurez-vous d'avoir :
 
 Un compte Azure actif.
@@ -10,32 +10,32 @@ Un terminal Linux ou une machine virtuelle Ubuntu.
 Les droits nécessaires pour créer des ressources sur Azure.
 Étape 1 : Installation des outils nécessaires
 
-Mettre à jour les paquets et installer curl :
+# Mettre à jour les paquets et installer curl :
 
 sudo apt update -y
 sudo apt install curl
 
-Installer uv (Universal Version Manager) :
+# Installer uv (Universal Version Manager) :
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-Installer Python et créer un environnement virtuel :
+# Installer Python et créer un environnement virtuel :
 uv python install
 uv venv ansible_ipi
 ansible_ipi/bin/activate
 
-Activer l'environnement virtuel :
+# Activer l'environnement virtuel :
 source ansible_ipi/bin/activate
 
-Mettre à jour pip et installer Ansible :
+# Mettre à jour pip et installer Ansible :
 uv tool run pip install --upgrade pip
 uv tool run pip install ansible
 
-Installer la collection Azure pour Ansible :
+# Installer la collection Azure pour Ansible :
 ansible-galaxy collection install azure.azcollection --force
 uv tool run pip install -r ~/.ansible/collections/ansible_collections/azure/azcollection/requirements.txt
 uv tool run pip install ansible[azure]
 
-Configurer les alias pour les commandes Ansible :
+# Configurer les alias pour les commandes Ansible :
 alias pip="uv tool run pip"
 alias ansible="uv tool run ansible"
 alias ansible-playbook="uv tool run ansible-playbook"
@@ -67,7 +67,7 @@ pip install -r ~/.ansible/collections/ansible_collections/azure/azcollection/req
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 echo "Installation terminée !"
 
-Étape 2 : Configuration des variables
+# Étape 2 : Configuration des variables
 
 Créez un fichier .yml contenant les variables suivantes :
 
@@ -90,7 +90,7 @@ address_prefix_vnet: 10.1.0.0/16
 address_prefix_subnet: 10.1.0.0/24
 Assurez-vous de remplacer les valeurs par celles correspondant à votre environnement.
 
-Étape 3 : Création des ressources Azure
+# Étape 3 : Création des ressources Azure
 Créez un fichier .yml avec le contenu suivant :
 
 - hosts: localhost
@@ -206,7 +206,7 @@ Créez un fichier .yml avec le contenu suivant :
           sku: "{{ image_sku }}"
           version: "{{ image_version }}"
 		  
-Étape 4 : Exécution du playbook
+# Étape 4 : Exécution du playbook
 
 Exécuter le playbook :
 ansible-playbook deploy_vm.yml
