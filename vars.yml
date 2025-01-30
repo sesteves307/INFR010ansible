@@ -1,17 +1,50 @@
+# Nom du groupe de ressources Azure
 resource_group_name: MARTEAUTEST
+ 
+# Région Azure où les ressources seront déployées
 location: westeurope
+ 
+# Nom du réseau virtuel (VNet) à créer
 vnet_name: TESTNETWORK
+ 
+# Nom du sous-réseau (subnet) à créer dans le VNet
 subnet_name: TESTSUBNET
+ 
+# Nom de l'adresse IP publique à créer
 public_ip_name: my_public_ip
+ 
+# Nom du groupe de sécurité réseau (NSG) à créer
 security_group_name: TESTSECURITYGROUP
+ 
+# Nom de l'interface réseau (NIC) à créer
 network_interface_name: nic001
+ 
+# Nom de la machine virtuelle (VM) à créer
 vm_name: TESTVM
+ 
+# Nom d'utilisateur administrateur pour la VM
 admin_username: emarteau
+ 
+# Mot de passe de l'utilisateur administrateur pour la VM
 admin_password: AzErCXZ876!
+ 
+# Taille de la VM (par exemple, Standard_B2ms)
 vm_size: Standard_B2ms
+ 
+# Offre d'image pour la VM (par exemple, UbuntuServer)
 image_offer: UbuntuServer
+ 
+# Éditeur de l'image pour la VM (par exemple, Canonical)
 image_publisher: Canonical
+ 
+# SKU de l'image pour la VM (par exemple, '18.04-LTS')
 image_sku: '18.04-LTS'
+ 
+# Version de l'image pour la VM (par exemple, 'latest')
 image_version: latest
+ 
+# Préfixe d'adresse pour le VNet (par exemple, 10.1.0.0/16)
 address_prefix_vnet: 10.1.0.0/16
+ 
+# Préfixe d'adresse pour le sous-réseau (par exemple, 10.1.0.0/24)
 address_prefix_subnet: 10.1.0.0/24
