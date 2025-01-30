@@ -1,0 +1,121 @@
+# Realisé par: MARTEAU Evan, GIRAUD Anthony, LERICHE Vincent, ESTEVES DE SOUSA Sergio
+# Version: 1.0
+
+- hosts: localhost
+  connection: local
+  vars_files:
+    - vars.yml  # Importation du fichier de variables "vars.yml", où toutes les valeurs de configuration sont stockées
+  tasks:
+    # Création du groupe de ressources
+    - name: Create a resource group
+      azure_rm_resourcegroup:
+        name: "{{ resource_group_name }}"  # Nom du groupe de ressources (défini dans vars.yml)
+        location: "{{ location }}"  # Région de déploiement, définie dans vars.yml
+        state: present  # S'assurer que le groupe de ressources existe
+        tags:
+          testing: testing  # Tag personnalisé pour indiquer que c'est un environnement de test
+          delete: never  # Tag pour empêcher la suppression de ce groupe
+ 
+    # Création du réseau virtuel
+    - name: Create a virtual network
+      azure_rm_virtualnetwork:
+        resource_group: "{{ resource_group_name }}"  # Groupe de ressources où sera créé le réseau
+        name: "{{ vnet_name }}"  # Nom du réseau virtuel (défini dans vars.yml)
+        location: "{{ location }}"  # Région où le réseau virtuel sera créé
+        state: present  # Vérifier ou créer le réseau virtuel
+        address_prefixes_cidr:
+          - "{{ address_prefix_vnet }}"  # Plage d'adresses CIDR pour le réseau virtuel
+ 
+    # Création d'un sous-réseau dans le réseau virtuel
+    - name: Create a subnet
+      azure_rm_subnet:
+        resource_group: "{{ resource_group_name }}"  # Groupe de ressources où se trouve le sous-réseau
+        virtual_network_name: "{{ vnet_name }}"  # Nom du réseau virtuel
+        name: "{{ subnet_name }}"  # Nom du sous-réseau
+        address_prefix_cidr: "{{ address_prefix_subnet }}"  # Plage d'adresses CIDR pour le sous-réseau
+ 
+    # Création d'une adresse IP publique
+    - name: Create a public IP address
+      azure_rm_publicipaddress:
+        resource_group: "{{ resource_group_name }}"  # Groupe de ressources pour l'IP publique
+        name: "{{ public_ip_name }}"  # Nom de l'adresse IP publique
+        location: "{{ location }}"  # Région de l'adresse IP publique
+        state: present  # S'assurer que l'adresse IP publique existe
+        allocation_method: static  # Méthode d'allocation de l'IP (statique)
+ 
+    # Création d'un groupe de sécurité réseau (NSG)
+    - name: Create a security group
+      azure_rm_securitygroup:
+        resource_group: "{{ resource_group_name }}"  # Groupe de ressources où sera créé le NSG
+        name: "{{ security_group_name }}"  # Nom du groupe de sécurité réseau
+        purge_rules: true  # Purge des règles par défaut si nécessaire
+        rules:  # Liste des règles du groupe de sécurité
+          - name: "Deny-AllIn"  # Règle pour bloquer toutes les connexions entrantes
+            priority: 101  # Priorité de la règle (doit être unique)
+            direction: Inbound  # Connexions entrantes
+            access: Deny  # Bloquer l'accès
+            protocol: "*"  # Tous les protocoles
+            source_address_prefix: "*"  # Source de toutes les adresses
+            destination_address_prefix: "*"  # Destination de toutes les adresses
+            source_port_range: "*"  # Toutes les plages de ports
+            destination_port_range: "*"  # Toutes les plages de ports
+ 
+          - name: 'AllowSSHIn'  # Règle pour autoriser SSH en entrée
+            protocol: Tcp  # Protocole TCP pour SSH
+            access: Allow  # Autoriser l'accès
+            direction: Inbound  # Connexions entrantes
+            priority: 100  # Priorité de la règle
+            source_address_prefix: "*"  # Toutes les sources
+            destination_address_prefix: "*"  # Toutes les destinations
+            destination_port_range: 22  # Port SSH (22)
+ 
+          - name: "Deny-AllOut"  # Règle pour bloquer toutes les connexions sortantes
+            priority: 101  # Priorité de la règle
+            direction: Outbound  # Connexions sortantes
+            access: Deny  # Bloquer l'accès
+            protocol: "*"  # Tous les protocoles
+            source_address_prefix: "*"  # Toutes les sources
+            destination_address_prefix: "*"  # Toutes les destinations
+            source_port_range: "*"  # Toutes les plages de ports
+            destination_port_range: "*"  # Toutes les plages de ports
+ 
+          - name: 'AllowSSHOut'  # Règle pour autoriser SSH sortant
+            protocol: Tcp  # Protocole TCP pour SSH
+            access: Allow  # Autoriser l'accès
+            direction: Outbound  # Connexions sortantes
+            priority: 100  # Priorité de la règle
+            source_address_prefix: "*"  # Toutes les sources
+            destination_address_prefix: "*"  # Toutes les destinations
+            destination_port_range: 22  # Port SSH (22)
+ 
+    # Création d'une interface réseau
+    - name: Create a network interface
+      azure_rm_networkinterface:
+        name: "{{ network_interface_name }}"  # Nom de l'interface réseau
+        resource_group: "{{ resource_group_name }}"  # Groupe de ressources pour l'interface
+        virtual_network: "{{ vnet_name }}"  # Nom du réseau virtuel auquel l'interface sera connectée
+        location: "{{ location }}"  # Région où sera créée l'interface
+        state: present  # Vérifier ou créer l'interface réseau
+        subnet_name: "{{ subnet_name }}"  # Nom du sous-réseau
+        security_group: "{{ security_group_name }}"  # Groupe de sécurité réseau à appliquer à l'interface
+        ip_configurations:
+          - name: ipconfig1  # Configuration de l'IP pour l'interface réseau
+            public_ip_address_name: "{{ public_ip_name }}"  # Nom de l'adresse IP publique
+            primary: true  # Configurer cette IP comme principale
+ 
+    # Création de la machine virtuelle
+    - name: Create VM with defaults
+      azure_rm_virtualmachine:
+        resource_group: "{{ resource_group_name }}"  # Groupe de ressources pour la machine virtuelle
+        name: "{{ vm_name }}"  # Nom de la machine virtuelle
+        admin_username: "{{ admin_username }}"  # Nom d'utilisateur administrateur
+        admin_password: "{{ admin_password }}"  # Mot de passe de l'administrateur
+        location: "{{ location }}"  # Région pour la VM
+        vm_size: "{{ vm_size }}"  # Taille de la machine virtuelle
+        state: present  # Vérifier ou créer la machine virtuelle
+        network_interfaces: "{{ network_interface_name }}"  # Interface réseau attachée à la VM
+        image:
+          offer: "{{ image_offer }}"  # Offre d'image pour la VM (par exemple, Ubuntu)
+          publisher: "{{ image_publisher }}"  # Éditeur de l'image
+          sku: "{{ image_sku }}"  # Version de l'image (par exemple, Ubuntu 18.04 LTS)
+          version: "{{ image_version }}"  # Version de l'image (dernière version)

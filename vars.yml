@@ -1,0 +1,17 @@
+resource_group_name: MARTEAUTEST
+location: westeurope
+vnet_name: TESTNETWORK
+subnet_name: TESTSUBNET
+public_ip_name: my_public_ip
+security_group_name: TESTSECURITYGROUP
+network_interface_name: nic001
+vm_name: TESTVM
+admin_username: emarteau
+admin_password: AzErCXZ876!
+vm_size: Standard_B2ms
+image_offer: UbuntuServer
+image_publisher: Canonical
+image_sku: '18.04-LTS'
+image_version: latest
+address_prefix_vnet: 10.1.0.0/16
+address_prefix_subnet: 10.1.0.0/24
