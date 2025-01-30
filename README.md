@@ -70,6 +70,7 @@ echo "Installation terminée !"
 # Étape 2 : Configuration des variables
 
 Créez un fichier .yml contenant les variables suivantes :
+```
 
 resource_group_name: MARTEAUTEST
 location: westeurope
@@ -89,10 +90,12 @@ image_version: latest
 address_prefix_vnet: 10.1.0.0/16
 address_prefix_subnet: 10.1.0.0/24
 Assurez-vous de remplacer les valeurs par celles correspondant à votre environnement.
+```
 
 # Étape 3 : Création des ressources Azure
 Créez un fichier .yml avec le contenu suivant :
 
+```
 - hosts: localhost
   connection: local
   vars_files:
@@ -205,6 +208,7 @@ Créez un fichier .yml avec le contenu suivant :
           publisher: "{{ image_publisher }}"
           sku: "{{ image_sku }}"
           version: "{{ image_version }}"
+```
 		  
 # Étape 4 : Exécution du playbook
 
